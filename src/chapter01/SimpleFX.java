@@ -16,8 +16,10 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
+import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
+import java.io.File;
 import java.time.LocalDateTime;
 
 
@@ -84,11 +86,15 @@ public class SimpleFX extends Application {
 
 
         btnSave.setOnAction(event -> {
-            textFileIO.append(
+            FileChooser fileChooser = new FileChooser();
+            File file = fileChooser.showSaveDialog(null);
+            textFileIO.append(file,
                     LocalDateTime.now().withNano(0) + " " + taDisplay.getText());
         });
         btnOpen.setOnAction(event -> {
-            String msg = textFileIO.load();
+            FileChooser fileChooser = new FileChooser();
+            File file = fileChooser.showSaveDialog(null);
+            String msg = textFileIO.load(file);
             if (msg != null) {
                 taDisplay.clear();
                 taDisplay.setText(msg);
