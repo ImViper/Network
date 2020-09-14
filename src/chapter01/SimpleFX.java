@@ -1,5 +1,6 @@
 package chapter01;
 
+import com.sun.xml.internal.ws.api.model.wsdl.WSDLOutput;
 import javafx.application.Application;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
@@ -50,7 +51,7 @@ public class SimpleFX extends Application {
         hBox.setAlignment(Pos.CENTER_RIGHT);
         hBox.getChildren().addAll(btnSend, btnSave, btnOpen, btnExit);
         mainPane.setBottom(hBox);
-        Scene scene = new Scene(mainPane, 700, 400);
+        Scene scene = new Scene(mainPane, 500, 400);
         primaryStage.setScene(scene);
         primaryStage.show();
 
@@ -72,6 +73,7 @@ public class SimpleFX extends Application {
                     String msg = tfSend.getText();
                     taDisplay.appendText("echo" + msg + "\n");
                     tfSend.clear();
+
                 } else if (event.getCode() == KeyCode.ENTER) {
                     String msg = tfSend.getText();
                     taDisplay.appendText(msg + "\n");
@@ -87,10 +89,13 @@ public class SimpleFX extends Application {
         });
         btnOpen.setOnAction(event -> {
             String msg = textFileIO.load();
-            if(msg != null){
+            if (msg != null) {
                 taDisplay.clear();
                 taDisplay.setText(msg);
+
             }
         });
     }
+
+
 }
