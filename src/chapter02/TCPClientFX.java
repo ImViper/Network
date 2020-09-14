@@ -64,7 +64,7 @@ public class TCPClientFX extends Application {
         primaryStage.setScene(scene);
         primaryStage.show();
 
-
+        btnSend.setDisable(true);
         btnConnect.setOnAction(event -> {
             String ip = tfip.getText().trim();
             String port = tfport.getText().trim();
@@ -72,10 +72,14 @@ public class TCPClientFX extends Application {
                 tcpClient = new TCPClient(ip,port);
                 String firstMsg = tcpClient.receive();
                 taDisplay.appendText(firstMsg+"\n");
+                btnSend.setDisable(false);
+                btnConnect.setDisable(true);
             } catch (IOException e) {
                 taDisplay.appendText("服务器连接失败"+e.getMessage()+"\n");
+                btnSend.setDisable(true);
             }
         });
+
         btnExit.setOnAction(event -> {
             endSystem();
         });
@@ -84,11 +88,17 @@ public class TCPClientFX extends Application {
         });
         btnSend.setOnAction(event -> {
             String sendMsg = tfSend.getText();
+            if(sendMsg.equals("bye")) {
+                btnConnect.setDisable(false);
+                btnSend.setDisable(true);
+            }
             tcpClient.send(sendMsg);//向服务器发送一串字符
             taDisplay.appendText("客户端发送：" + sendMsg + "\n");
             String receiveMsg = tcpClient.receive();//从服务器接收一行字符
             taDisplay.appendText(receiveMsg + "\n");
+            tfSend.clear();
         });
+
     }
 
     private void endSystem() {
