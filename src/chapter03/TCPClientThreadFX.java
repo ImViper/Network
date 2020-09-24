@@ -24,8 +24,8 @@ public class TCPClientThreadFX extends Application {
     private Button btnConnect = new Button("连接");
     //待发送信息的文本框
     private TextField tfSend = new TextField();
-    private TextField tfip = new TextField();
-    private TextField tfport = new TextField();
+    private TextField tfip = new TextField("127.0.0.1");
+    private TextField tfport = new TextField("8008");
     //显示信息的文本区域
     private TextArea taDisplay = new TextArea();
     private TextFileIO textFileIO = new TextFileIO();
@@ -111,8 +111,9 @@ public class TCPClientThreadFX extends Application {
             }
             tcpClient.send(sendMsg);//向服务器发送一串字符
             taDisplay.appendText("客户端发送：" + sendMsg + "\n");
-            String receiveMsg = tcpClient.receive();//从服务器接收一行字符
-            taDisplay.appendText(receiveMsg + "\n");
+            //注释掉这句话，和线程不冲突，不会卡死。
+//            String receiveMsg = tcpClient.receive();//从服务器接收一行字符
+//            taDisplay.appendText(receiveMsg + "\n");
             tfSend.clear();
         });
 
