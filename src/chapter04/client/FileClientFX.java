@@ -34,7 +34,7 @@ public class FileClientFX extends Application {
     Thread readThread;
     private String ip;
     private String port;
-
+    private boolean isValidFile=true;
     public static void main(String[] args) {
         launch(args);
     }
@@ -136,6 +136,7 @@ public class FileClientFX extends Application {
             File saveFile = fileChooser.showSaveDialog(null);
             if(saveFile==null)
                 return;
+
             System.out.println("debug"+fName);
             try{
                 new FileDataClient(ip,"2020").getFile(saveFile);
