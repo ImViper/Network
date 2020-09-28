@@ -72,8 +72,9 @@ public class TCPClientThreadFX extends Application {
             String port = tfport.getText().trim();
             try {
                 tcpClient = new TCPClient(ip,port);
-                String firstMsg = tcpClient.receive();
-                taDisplay.appendText(firstMsg+"\n");
+                // 多线程不需要这一条了
+//                String firstMsg = tcpClient.receive();
+//                taDisplay.appendText(firstMsg+"\n");
                 btnSend.setDisable(false);
                 btnConnect.setDisable(true);
                 //多线程方法
