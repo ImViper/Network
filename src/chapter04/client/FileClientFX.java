@@ -30,7 +30,7 @@ public class FileClientFX extends Application {
     //显示信息的文本区域
     private TextArea taDisplay = new TextArea();
     private TextFileIO textFileIO = new TextFileIO();
-    private TCPClient tcpClient;
+    private FileDialogClient fileDialogClient;
     Thread readThread;
     private String ip;
     private String port;
@@ -71,19 +71,20 @@ public class FileClientFX extends Application {
 
         btnSend.setDisable(true);
         btnConnect.setOnAction(event -> {
-            String ip = tfip.getText().trim();
-            String port = tfport.getText().trim();
+            ip = tfip.getText().trim();
+            port = tfport.getText().trim();
             try {
-                tcpClient = new TCPClient(ip,port);
-                String firstMsg = tcpClient.receive();
-                taDisplay.appendText(firstMsg+"\n");
+                fileDialogClient = new FileDialogClient(ip,port);
+                // 多线程不需要这一条了
+//                String firstMsg = tcpClient.receive();
+//                taDisplay.appendText(firstMsg+"\n");
                 btnSend.setDisable(false);
                 btnConnect.setDisable(true);
                 //多线程方法
 
                 readThread = new Thread(()->{
                     String msg = null;
-                    while((msg = tcpClient.receive())!=null){
+                    while((msg = fileDialogClient.receive())!=null){
                         String msgTemp = msg;
                         Platform.runLater(()->{
                             taDisplay.appendText(msgTemp+"\n");
@@ -112,7 +113,7 @@ public class FileClientFX extends Application {
                 btnConnect.setDisable(false);
                 btnSend.setDisable(true);
             }
-            tcpClient.send(sendMsg);//向服务器发送一串字符
+            fileDialogClient.send(sendMsg);//向服务器发送一串字符
             taDisplay.appendText("客户端发送：" + sendMsg + "\n");
             //注释掉这句话，和线程不冲突，不会卡死。
 //            String receiveMsg = tcpClient.receive();//从服务器接收一行字符
@@ -127,8 +128,8 @@ public class FileClientFX extends Application {
         btnDownload.setOnAction(event -> {
             if(tfSend.getText().equals(""))
                 return;
-            if(!isValidFile)
-                return;
+//            if(!isValidFile)
+//                return;
             String fName = tfSend.getText().trim();
             tfSend.clear();
             FileChooser fileChooser = new FileChooser();
@@ -143,7 +144,6 @@ public class FileClientFX extends Application {
                 Alert alert = new Alert(Alert.AlertType.INFORMATION);
                 alert.setContentText(saveFile.getName()+"下载完毕");
                 alert.showAndWait();
-                FileDialogClient fileDialogClient=new FileDialogClient(ip,"2021");
                 fileDialogClient.send("客户端开启下载");
             }catch (IOException e){
                 e.printStackTrace();
@@ -152,10 +152,10 @@ public class FileClientFX extends Application {
     }
 
     private void endSystem() {
-        if(tcpClient != null){
+        if(fileDialogClient != null){
             //向服务器发送关闭连接的约定信息
-            tcpClient.send("bye");
-            tcpClient.close();
+            fileDialogClient.send("bye");
+            fileDialogClient.close();
         }
         System.exit(0);
     }

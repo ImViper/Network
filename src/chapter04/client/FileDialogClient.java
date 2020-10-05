@@ -57,7 +57,6 @@ public class FileDialogClient {
     //定义字符输入流和输出流
     private PrintWriter pw;
     private BufferedReader br;
-
     public FileDialogClient(String ip, String port) throws IOException {
         //主动向服务器发起连接，实现TCP的三次握手过程
         //如果不成功，则抛出错误信息，其错误信息交由调用者处理
