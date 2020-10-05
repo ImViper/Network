@@ -39,39 +39,34 @@ public class TCPThreadServer {
 
         @Override
         public void run() {
-            //本地服务器控制台显示客户端连接的用户信息
-            System.out.println("New connection accepted： " + socket.getInetAddress());
-            try {
-                BufferedReader br = getReader(socket);//定义字符串输入流
-                PrintWriter pw = getWriter(socket);//定义字符串输出流
-
-                //客户端正常连接成功，则发送服务器欢迎信息，然后等待客户发送信息
-                pw.println("From 服务器：欢迎使用本服务！");
+            System.out.println("New connection accepted:"+socket.getInetAddress());
+            try{
+                BufferedReader br = getReader(socket);
+                PrintWriter pw = getWriter(socket);
+                pw.println("From 服务器：欢饮使用本服务！");
 
                 String msg = null;
-                //此处程序阻塞，每次从输入流中读入一行字符串
-                while ((msg = br.readLine()) != null) {
-                    //如果客户发送的消息为"bye"，就结束通信
-                    if (msg.trim().equalsIgnoreCase("bye")) {
-                        //向输出流中输出一行字符串,远程客户端可以读取该字符串
-                        pw.println("From 服务器：服务器已断开连接，结束服务！");
+                while((msg = br.readLine())!=null){
+                    if(msg.trim().equalsIgnoreCase("bye")){
+                        pw.println("From 服务器：服务器已经断开连接，结束服务！");
                         System.out.println("客户端离开");
-                        break;//跳出循环读取
+                        break;
                     }
-                    //向输出流中回传字符串,远程客户端可以读取该字符串
-                    pw.println("From 服务器：" + msg);
-
+                    pw.println("From 服务器"+msg);
                 }
-            } catch (IOException e) {
+
+            }catch (IOException e){
                 e.printStackTrace();
             }finally {
-                try {
-                    if(socket != null)
-                        socket.close(); //关闭socket连接及相关的输入输出流
-                } catch (IOException e) {
+                try{
+                    if(socket !=null)
+                        socket.close();
+                }catch (IOException e){
                     e.printStackTrace();
                 }
             }
+
+
         }
     }
 
@@ -92,7 +87,6 @@ public class TCPThreadServer {
     }
 
 
-    //单客户版本，即每一次只能与一个客户建立通信连接
 
 
     public static void main(String[] args) throws IOException{

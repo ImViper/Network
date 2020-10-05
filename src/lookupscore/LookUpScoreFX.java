@@ -73,8 +73,8 @@ public class LookUpScoreFX extends Application {
             String port = tfport.getText().trim();
             try {
                 lookUpScore = new LookUpScore(ip,port);
-                String firstMsg = lookUpScore.receive();
-                taDisplay.appendText(firstMsg+"\n");
+//                String firstMsg = lookUpScore.receive();
+//                taDisplay.appendText(firstMsg+"\n");
                 btnSend.setDisable(false);
                 btnConnect.setDisable(true);
                 //多线程方法
@@ -112,8 +112,8 @@ public class LookUpScoreFX extends Application {
             }
             lookUpScore.send(sendMsg);//向服务器发送一串字符
             taDisplay.appendText("客户端发送：" + sendMsg + "\n");
-            String receiveMsg = lookUpScore.receive();//从服务器接收一行字符
-            taDisplay.appendText(receiveMsg + "\n");
+//            String receiveMsg = lookUpScore.receive();//从服务器接收一行字符
+//            taDisplay.appendText(receiveMsg + "\n");
             tfSend.clear();
         });
 

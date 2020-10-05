@@ -35,21 +35,27 @@ public class GroupServer {
         }
     }
 
-    private void sendToAllMembers(String msg) throws IOException{
+    private void sendToAllMembers(String msg,String hostAddress) throws IOException{
         PrintWriter pw;
         OutputStream out;
-        Socket tempSocket;
-
-        Iterator<Socket> iterator = members.iterator();
-        while (iterator.hasNext()) {//遍历在线客户Set集合
-            tempSocket = iterator.next(); //取出一个客户的socket
-            String hostName = tempSocket.getInetAddress().getHostName();
-            String hostAddress = tempSocket.getInetAddress().getHostAddress();
+        for(Socket tempSocket:members) {
             out = tempSocket.getOutputStream();
-            pw = new PrintWriter(
-                    new OutputStreamWriter(out, "utf-8"), true);
-            pw.println(tempSocket.getInetAddress() + " 发言：" + msg );
+            pw = new PrintWriter(new OutputStreamWriter(out,"utf-8"),true);
+            pw.println(hostAddress + "发言"+msg);
+
         }
+//        Socket tempSocket;
+
+//        Iterator<Socket> iterator = members.iterator();
+//        while (iterator.hasNext()) {//遍历在线客户Set集合
+//            tempSocket = iterator.next(); //取出一个客户的socket
+//            String hostName = tempSocket.getInetAddress().getHostName();
+//            String hostAddress = tempSocket.getInetAddress().getHostAddress();
+//            out = tempSocket.getOutputStream();
+//            pw = new PrintWriter(
+//                    new OutputStreamWriter(out, "utf-8"), true);
+//            pw.println(tempSocket.getInetAddress() + " 发言：" + msg );
+
     }
 
     class Handler implements Runnable{
@@ -81,7 +87,7 @@ public class GroupServer {
                         break;//跳出循环读取
                     }
                     //向输出流中回传字符串,远程客户端可以读取该字符串
-                    sendToAllMembers(msg);
+                    sendToAllMembers(msg,socket.getInetAddress().getHostAddress());
 
                 }
             } catch (IOException e) {
