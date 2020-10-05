@@ -137,6 +137,7 @@ public class FileClientFX extends Application {
             File saveFile = fileChooser.showSaveDialog(null);
             if(saveFile==null)
                 return;
+
             System.out.println("debug"+fName);
             try{
                 new FileDataClient(ip,"2020").getFile(saveFile);
