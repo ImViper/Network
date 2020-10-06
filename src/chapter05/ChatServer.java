@@ -3,8 +3,7 @@ package chapter05;
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.HashMap;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.concurrent.ExecutorService;
@@ -15,8 +14,8 @@ public class ChatServer {
     private ServerSocket serverSocket; //定义服务器套接字
     private ExecutorService executorService;
     private static Set<Socket> members = new CopyOnWriteArraySet<Socket>();
-    private static HashMap<String,Socket> info = new HashMap<String, Socket>();
-
+    private static HashMap<Socket,String> info = new HashMap();
+    private Stack<Socket> stack;
     public ChatServer() throws IOException {
         serverSocket = new ServerSocket(8008);
         executorService = Executors.newCachedThreadPool();
@@ -27,7 +26,10 @@ public class ChatServer {
             Socket socket = null;
             try{
                 socket = serverSocket.accept(); //监听客户请求, 阻塞语句.
+                BufferedReader br = getReader(socket);
+                String msg = br.readLine();
                 members.add(socket);
+                info.put(socket,msg);
                 //接受一个客户请求,从线程池中拿出一个线程专门处理该客户.
                 executorService.execute(new Handler(socket));
             }catch (IOException ex){
@@ -35,7 +37,29 @@ public class ChatServer {
             }
         }
     }
+    //发送给一个人
+    private void sendToOne(String name,String msg,Socket socket) throws IOException{
+        PrintWriter pw;
+        OutputStream out;
+            Socket getsocket = getKey(info,name);
+            out = getsocket.getOutputStream();
+            pw = new PrintWriter(new OutputStreamWriter(out,"utf-8"),true);
+            pw.println(info.get(socket) + "发言="+msg);
 
+
+    }
+    //一对多
+    private void sendToAllMany(String msg,Socket socket) throws IOException {
+        PrintWriter pw;
+        OutputStream out;
+        for (Socket tempSocket : stack) {
+            out = tempSocket.getOutputStream();
+            pw = new PrintWriter(new OutputStreamWriter(out, "utf-8"), true);
+            pw.println(info.get(socket)+ "发言=" + msg);
+
+        }
+    }
+    //群聊
     private void sendToAllMembers(String msg,String hostAddress) throws IOException{
         PrintWriter pw;
         OutputStream out;
@@ -59,6 +83,71 @@ public class ChatServer {
 
     }
 
+    //上线登录消息
+    private void LoginMsg(Socket socket) throws IOException{
+        PrintWriter pw;
+        OutputStream out;
+        for(Socket tempSocket:members) {
+            out = tempSocket.getOutputStream();
+            pw = new PrintWriter(new OutputStreamWriter(out,"utf-8"),true);
+            pw.println(info.get(socket)+"上线啦");
+        }
+    }
+
+    //上线信息广播
+    private void LoginInfo(Socket socket)throws IOException{
+        PrintWriter pw;
+        OutputStream out;
+            out = socket.getOutputStream();
+            pw = new PrintWriter(new OutputStreamWriter(out,"utf-8"),true);
+        for(String msg : info.values())
+            pw.println( msg+"在线");
+//            for(Socket socket1 : info.keySet())
+//                pw.println(socket1+" "+ info.get(socket1)+"在线");
+
+    }
+
+    //找多个name
+    private void findName(String msg){
+        stack = new Stack();
+        Socket getsocket;
+        msg=msg.substring(3);
+        while(msg.indexOf(",")>=0){
+            int r = msg.indexOf(",");
+            String name=msg.substring(0,r);
+             getsocket = getKey(info,name);
+            stack.push(getsocket);
+            msg=msg.substring(r+1);
+        }
+        int r = msg.indexOf(":");
+        String name=msg.substring(0,r);
+        getsocket = getKey(info,name);
+        stack.push(getsocket);
+    }
+
+    //根据key找value
+    public static Socket getKey(HashMap<Socket,String> map,String value){
+        Socket key = null;
+        //Map,HashMap并没有实现Iteratable接口.不能用于增强for循环.
+        for(Socket getKey: map.keySet()){
+            if(map.get(getKey).equals(value)){
+                key = getKey;
+            }
+        }
+        return key;
+        //这个key肯定是最后一个满足该条件的key.
+    }
+
+//    public static Socket getKey(Map map, String value){
+//        List<Object> keyList = new ArrayList<>();
+//        for(Object key: map.keySet()){
+//            if(map.get(key).equals(value)){
+//                keyList.add(key);
+//            }
+//        }
+//        return keyList;
+//    }
+
     class Handler implements Runnable{
         private Socket socket;
         public Handler(Socket socket) {
@@ -73,10 +162,9 @@ public class ChatServer {
             try {
                 BufferedReader br = getReader(socket);//定义字符串输入流
                 PrintWriter pw = getWriter(socket);//定义字符串输出流
-
                 //客户端正常连接成功，则发送服务器欢迎信息，然后等待客户发送信息
                 pw.println("From 服务器：欢迎使用本服务！");
-
+                LoginMsg(socket);
                 String msg = null;
                 //此处程序阻塞，每次从输入流中读入一行字符串
                 while ((msg = br.readLine()) != null) {
@@ -87,9 +175,29 @@ public class ChatServer {
                         System.out.println("客户端离开");
                         break;//跳出循环读取
                     }
-                    //向输出流中回传字符串,远程客户端可以读取该字符串
-                    sendToAllMembers(msg,socket.getInetAddress().getHostAddress());
+                    if(msg.trim().equalsIgnoreCase("login")){
+                        LoginInfo(socket);
+                        continue;
+                    }
+                    if(msg.indexOf("发送给")==0){
+                        if(msg.indexOf(",")!=0){
+                            findName(msg);
+                            int r = msg.indexOf(":");
+                            msg=msg.substring(r+1);
+                            sendToAllMany(msg,socket);
 
+                        }
+                        else {
+                            int r = msg.indexOf(":");
+                            String name = msg.substring(3, r);
+                            String msg1 = msg.substring(r + 1);
+                            sendToOne(name, msg1, socket);
+                        }
+                    }
+                    //向输出流中回传字符串,远程客户端可以读取该字符串
+                    else {
+                        sendToAllMembers(msg, socket.getInetAddress().getHostAddress());
+                    }
                 }
             } catch (IOException e) {
                 e.printStackTrace();
