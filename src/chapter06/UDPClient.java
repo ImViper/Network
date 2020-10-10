@@ -45,4 +45,10 @@ public class UDPClient {
         }
         return msg;
     }
+
+    public void close() {
+        if (socket != null) {
+            socket.close();
+        }
+    }
 }
