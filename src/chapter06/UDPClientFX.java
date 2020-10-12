@@ -78,6 +78,19 @@ public class UDPClientFX extends Application {
                 btnSend.setDisable(false);
                 btnConnect.setDisable(true);
                 //多线程方法
+                readThread = new Thread(()->{
+                    String msg = null;
+                    while((msg = udpClient.receive())!=null){
+                        String msgTemp = msg;
+                        Platform.runLater(()->{
+                            taDisplay.appendText(msgTemp+"\n");
+                        });
+                    }
+                    Platform.runLater(()->{
+                        taDisplay.appendText("对话已关闭！\n");
+                    });
+                });
+                readThread.start();
             } catch (IOException e) {
                 taDisplay.appendText("服务器连接失败"+e.getMessage()+"\n");
                 btnSend.setDisable(true);
@@ -99,8 +112,8 @@ public class UDPClientFX extends Application {
             udpClient.send(sendMsg);//向服务器发送一串字符
             taDisplay.appendText("客户端发送：" + sendMsg + "\n");
             //注释掉这句话，和线程不冲突，不会卡死。
-            String receiveMsg = udpClient.receive();//从服务器接收一行字符
-            taDisplay.appendText(receiveMsg + "\n");
+//            String receiveMsg = udpClient.receive();//从服务器接收一行字符
+//            taDisplay.appendText(receiveMsg + "\n");
             tfSend.clear();
         });
 

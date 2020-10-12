@@ -25,11 +25,11 @@ public class UDPServer {
     }
     public void Runserver() throws IOException {
         while(true){
-            System.out.println("等待第一条消息");
+            System.out.println("等待消息");
             server.receive(packet);
             System.out.println("接收到信息");
             String msg = new String(packet.getData(),packet.getOffset(),packet.getLength(),"utf-8");
-            String remsg = "20181002946&蔡诚杰"+new Date().toString()+"&"+msg;
+            String remsg = "20181002946&蔡诚杰&"+new Date().toString()+"&"+msg;
             byte[] outPutData = remsg.getBytes("utf-8");
             DatagramPacket outputPacket = new DatagramPacket(outPutData,outPutData.length,packet.getAddress(),packet.getPort());
             server.send(outputPacket);
