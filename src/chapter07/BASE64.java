@@ -7,8 +7,8 @@ package chapter07;
  */
 public class BASE64 {
     public static void main(String[] args) {
-        String userName="你的完整邮件名";
-        String authCode = "你的邮箱授权码";
+        String userName="756627124@qq.com";
+        String authCode = "rbrxsegwmwjgbbge";
 
         System.out.println(encode(userName));
         System.out.println(encode(authCode));
