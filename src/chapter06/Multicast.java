@@ -23,7 +23,7 @@ public class Multicast {
 
     public void send(String msg) {
         try {
-            outBuff = ("201700000001 程旭元: " + msg).getBytes("utf-8");
+            outBuff = ("20181002946 蔡诚杰: " + msg).getBytes("utf-8");
             DatagramPacket outPacket = new DatagramPacket(outBuff, outBuff.length,
                     groupIP, port);
             ms.send(outPacket);
