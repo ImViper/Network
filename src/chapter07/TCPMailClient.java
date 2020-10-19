@@ -52,13 +52,13 @@ package chapter07;
 import java.io.*;
 import java.net.Socket;
 
-public class TCPClient {
+public class TCPMailClient {
     private Socket socket; //定义套接字
     //定义字符输入流和输出流
     private PrintWriter pw;
     private BufferedReader br;
 
-    public TCPClient(String ip, String port) throws IOException {
+    public TCPMailClient(String ip, String port) throws IOException {
         //主动向服务器发起连接，实现TCP的三次握手过程
         //如果不成功，则抛出错误信息，其错误信息交由调用者处理
         socket = new Socket(ip, Integer.parseInt(port));
@@ -78,6 +78,11 @@ public class TCPClient {
     public void send(String msg) {
         //输出字符流，由Socket调用系统底层函数，经网卡发送字节流
         pw.println(msg);
+        try{
+            Thread.sleep(200);
+        }catch (InterruptedException e){
+            e.printStackTrace();
+        }
     }
 
     public String receive() {
@@ -104,9 +109,9 @@ public class TCPClient {
     }
     //本机模块内测试与运行，需先运行TCPServer
     public static void main(String[] args) throws IOException {
-        TCPClient tcpClient = new TCPClient("127.0.0.1" ,"8008");
-        tcpClient.send("hello");//发送一串字符
+        TCPMailClient tcpMailClient = new TCPMailClient("127.0.0.1" ,"8008");
+        tcpMailClient.send("hello");//发送一串字符
         //接收服务器返回的字符串并显示
-        System.out.println(tcpClient.receive());
+        System.out.println(tcpMailClient.receive());
     }
 }

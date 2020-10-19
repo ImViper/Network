@@ -29,7 +29,7 @@ public class TCPMailClientFX extends Application {
     //显示信息的文本区域
     private TextArea taDisplay = new TextArea();
     private TextFileIO textFileIO = new TextFileIO();
-    private TCPClient tcpClient;
+    private TCPMailClient tcpMailClient;
     Thread readThread;
     BASE64 base64;
 
@@ -67,12 +67,12 @@ public class TCPMailClientFX extends Application {
         primaryStage.setScene(scene);
         primaryStage.show();
 
-        btnSend.setDisable(true);
+//        btnSend.setDisable(true);
         btnConnect.setOnAction(event -> {
             String ip = tfip.getText().trim();
             String port = tfport.getText().trim();
             try {
-                tcpClient = new TCPClient(ip,port);
+                tcpMailClient = new TCPMailClient(ip,port);
                 // 多线程不需要这一条了
 //                String firstMsg = tcpClient.receive();
 //                taDisplay.appendText(firstMsg+"\n");
@@ -82,7 +82,7 @@ public class TCPMailClientFX extends Application {
 
                 readThread = new Thread(()->{
                     String msg = null;
-                    while((msg = tcpClient.receive())!=null){
+                    while((msg = tcpMailClient.receive())!=null){
                         String msgTemp = msg;
                         Platform.runLater(()->{
                             taDisplay.appendText(msgTemp+"\n");
@@ -111,7 +111,7 @@ public class TCPMailClientFX extends Application {
                 btnConnect.setDisable(false);
                 btnSend.setDisable(true);
             }
-            tcpClient.send(sendMsg);//向服务器发送一串字符
+            tcpMailClient.send(sendMsg);//向服务器发送一串字符
             taDisplay.appendText("客户端发送：" + sendMsg + "\n");
             //注释掉这句话，和线程不冲突，不会卡死。
 //            String receiveMsg = tcpClient.receive();//从服务器接收一行字符
@@ -122,10 +122,10 @@ public class TCPMailClientFX extends Application {
     }
 
     private void endSystem() {
-        if(tcpClient != null){
+        if(tcpMailClient != null){
             //向服务器发送关闭连接的约定信息
-            tcpClient.send("bye");
-            tcpClient.close();
+            tcpMailClient.send("bye");
+            tcpMailClient.close();
         }
         System.exit(0);
     }

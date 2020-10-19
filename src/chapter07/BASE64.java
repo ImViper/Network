@@ -14,7 +14,7 @@ public class BASE64 {
         System.out.println(encode(authCode));
     }
 
-    private static String  encode(String str) {
+    public static String  encode(String str) {
         return new sun.misc.BASE64Encoder().encode(str.getBytes());
     }
 }
