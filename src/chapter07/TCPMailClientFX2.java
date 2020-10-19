@@ -15,6 +15,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+import sun.misc.BASE64Encoder;
 
 import java.io.IOException;
 
@@ -104,39 +105,66 @@ public class TCPMailClientFX2 extends Application {
         primaryStage.setScene(scene);
         primaryStage.show();
 
-
-//        btnSend.setDisable(true);
-        btnConnect.setOnAction(event -> {
-            String ip = tfSmtpAddr.getText().trim();
-            String port = tfSmtpPort.getText().trim();
-            try {
-                tcpMailClient = new TCPMailClient(ip,port);
-                // 多线程不需要这一条了
+        String ip = tfSmtpAddr.getText().trim();
+        String port = tfSmtpPort.getText().trim();
+        try {
+            tcpMailClient = new TCPMailClient(ip,port);
+            // 多线程不需要这一条了
 //                String firstMsg = tcpClient.receive();
 //                taDisplay.appendText(firstMsg+"\n");
-                btnSend.setDisable(false);
-                btnConnect.setDisable(true);
-                //多线程方法
+            btnSend.setDisable(false);
+            btnConnect.setDisable(true);
+            //多线程方法
 
-                readThread = new Thread(()->{
-                    String msg = null;
-                    while((msg = tcpMailClient.receive())!=null){
-                        String msgTemp = msg;
-                        Platform.runLater(()->{
-                            taSerMsg.appendText(msgTemp+"\n");
-                        });
-                    }
+            readThread = new Thread(()->{
+                String msg = null;
+                while((msg = tcpMailClient.receive())!=null){
+                    String msgTemp = msg;
                     Platform.runLater(()->{
-                        taSerMsg.appendText("对话已关闭！\n");
+                        taSerMsg.appendText(msgTemp+"\n");
                     });
+                }
+                Platform.runLater(()->{
+                    taSerMsg.appendText("对话已关闭！\n");
                 });
-                readThread.start();
-            } catch (IOException e) {
-                taSerMsg.appendText("服务器连接失败"+e.getMessage()+"\n");
-                btnSend.setDisable(true);
-            }
-        });
-        btnConnect.fire();
+            });
+            readThread.start();
+        } catch (IOException e) {
+            taSerMsg.appendText("服务器连接失败"+e.getMessage()+"\n");
+            btnSend.setDisable(true);
+        }
+//        btnSend.setDisable(true);
+//        btnConnect.setOnAction(event -> {
+//            String ip = tfSmtpAddr.getText().trim();
+//            String port = tfSmtpPort.getText().trim();
+//            try {
+//                tcpMailClient = new TCPMailClient(ip,port);
+//                // 多线程不需要这一条了
+////                String firstMsg = tcpClient.receive();
+////                taDisplay.appendText(firstMsg+"\n");
+//                btnSend.setDisable(false);
+//                btnConnect.setDisable(true);
+//                //多线程方法
+//
+//                readThread = new Thread(()->{
+//                    String msg = null;
+//                    while((msg = tcpMailClient.receive())!=null){
+//                        String msgTemp = msg;
+//                        Platform.runLater(()->{
+//                            taSerMsg.appendText(msgTemp+"\n");
+//                        });
+//                    }
+//                    Platform.runLater(()->{
+//                        taSerMsg.appendText("对话已关闭！\n");
+//                    });
+//                });
+//                readThread.start();
+//            } catch (IOException e) {
+//                taSerMsg.appendText("服务器连接失败"+e.getMessage()+"\n");
+//                btnSend.setDisable(true);
+//            }
+//        });
+//        btnConnect.fire();
         btnExit.setOnAction(event -> {
             endSystem();
         });
@@ -147,41 +175,41 @@ public class TCPMailClientFX2 extends Application {
             String smtpAddr = tfSmtpAddr.getText().trim();
             String smtpPort = tfSmtpPort.getText().trim();
 
-            try {
-                tcpMailClient = new TCPMailClient(smtpAddr,smtpPort);
-                tcpMailClient.send("AUTH LOGIN");
+            //                tcpMailClient = new TCPMailClient(smtpAddr,smtpPort);
+            tcpMailClient.send("HELO Viper");
+            tcpMailClient.send("AUTH LOGIN");
 //            base64 = new BASE64();
-                String userName="756627124@qq.com";
-                String authCode = "rbrxsegwmwjgbbge";
-                String msg = BASE64.encode(userName);
-                tcpMailClient.send(msg);
-                System.out.println("userName send");
-                msg = BASE64.encode(authCode);
-                tcpMailClient.send(msg);
+            String userName="756627124@qq.com";
+            String authCode = "rbrxsegwmwjgbbge";
+            String msg = BASE64.encode(userName);
+            System.out.println(msg);
+            tcpMailClient.send(msg);
+            System.out.println("userName send");
+            msg = BASE64.encode(authCode);
+            tcpMailClient.send(msg);
 
-                msg = "MAIL FROM:<"+ tfSenderAddr.getText().trim()+">";
-                tcpMailClient.send(msg);
-                msg = "RCPT TO:<"+ tfRecieverAddr.getText().trim()+">";
-                tcpMailClient.send(msg);
-                msg = "DATA";
-                tcpMailClient.send(msg);
-                msg = "FROM:"+tfRecieverAddr.getText().trim();
-                tcpMailClient.send(msg);
-                msg = "Subject"+mtitle.getText().trim();
-                tcpMailClient.send(msg);
-                msg = "To"+tfRecieverAddr.getText().trim();
-                tcpMailClient.send(msg);
+            msg = "MAIL FROM:<"+ tfSenderAddr.getText().trim()+">";
+            tcpMailClient.send(msg);
+            msg = "RCPT TO:<"+ tfRecieverAddr.getText().trim()+">";
+            tcpMailClient.send(msg);
+            msg = "DATA";
+            tcpMailClient.send(msg);
+            msg = "FROM:"+tfSenderAddr.getText().trim();
+            tcpMailClient.send(msg);
+            msg = "Subject:"+mtitle.getText().trim();
+            tcpMailClient.send(msg);
+            msg = "To:"+tfRecieverAddr.getText().trim();
+            tcpMailClient.send(msg);
+            msg = "\n";
+            tcpMailClient.send(msg);
+            msg = taMainText.getText();
+            tcpMailClient.send(msg);
 
-                msg = taMainText.getText();
-                tcpMailClient.send(msg);
-
-                msg = ".";
-                tcpMailClient.send(msg);
-                msg = "QUIT";
-                tcpMailClient.send(msg);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+            msg = ".";
+            tcpMailClient.send(msg);
+            msg = "QUIT";
+            tcpMailClient.send(msg);
+            System.out.println("完成");
 
 //            String sendMsg = tfSend.getText();
 //            if(sendMsg.equals("bye")) {
@@ -196,6 +224,76 @@ public class TCPMailClientFX2 extends Application {
 //            tfSend.clear();
         });
 
+//                String msg;
+//                //tcpMailClient = new TCPMailClient(smtpAddr, smtpPort);
+//                tcpMailClient.send("HELO myfriend");
+//                //msg = tcpMailClient.receive();
+//                //feedBack.appendText(msg+ "\n");
+//
+//                tcpMailClient.send("AUTH LOGIN");
+//                //msg = tcpMailClient.receive();
+//                // feedBack.appendText(msg+ "\n");
+//
+//                String username = "756627124@qq.com";
+//                String authCode = "rbrxsegwmwjgbbge";
+//
+//                msg = new BASE64Encoder().encode(username.getBytes());
+//                tcpMailClient.send(msg);
+//                //msg = tcpMailClient.receive();
+//                // feedBack.appendText(msg+ "\n");
+//
+//                msg = new BASE64Encoder().encode(authCode.getBytes());
+//                tcpMailClient.send(msg);
+//                //msg = tcpMailClient.receive();
+//                //feedBack.appendText(msg+ "\n");
+//
+//                msg = "MAIL FROM:<" + tfSenderAddr.getText().trim() + ">";
+//                tcpMailClient.send(msg);
+//                //msg = tcpMailClient.receive();
+//                /// feedBack.appendText(msg+ "\n");
+//
+//                msg = "RCPT TO:<" + tfRecieverAddr.getText().trim() + ">";
+//                tcpMailClient.send(msg);
+//                //msg = tcpMailClient.receive();
+//                //feedBack.appendText(msg+ "\n");
+//
+//                msg = "DATA";
+//                tcpMailClient.send(msg);
+//                //msg = tcpMailClient.receive();
+//                // feedBack.appendText(msg+ "\n");
+//
+//                msg = "FROM:" + tfSenderAddr.getText().trim();
+//                tcpMailClient.send(msg);
+//                //msg = tcpMailClient.receive();
+//                //feedBack.appendText(msg+ "\n");
+//
+//                msg = "Subject:" + mtitle.getText().trim();
+//                tcpMailClient.send(msg);
+//                // msg = tcpMailClient.receive();
+//                // feedBack.appendText(msg+ "\n");
+//
+//                msg = "TO:" + tfRecieverAddr.getText().trim();
+//                tcpMailClient.send(msg);
+//                //msg = tcpMailClient.receive();
+//                // feedBack.appendText(msg+ "\n");
+//
+//                msg = taMainText.getText().trim();
+//                tcpMailClient.send("\n");
+//
+//                msg = taMainText.getText().trim();
+//                tcpMailClient.send(msg);
+//
+//                msg = ".";
+//                tcpMailClient.send(msg);
+//                //msg = tcpMailClient.receive();
+//                //feedBack.appendText(msg+ "\n");
+//
+//                msg = "QUIT";
+//                tcpMailClient.send(msg);
+//                //msg = tcpMailClient.receive();
+//                // feedBack.appendText(msg+ "\n");
+//
+//            });
     }
 
     private void endSystem() {
