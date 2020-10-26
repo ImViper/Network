@@ -56,54 +56,73 @@ public class URLClientFX extends Application {
         primaryStage.show();
 
 
-
+        btnClear.setOnAction(event -> {
+            taDisplay.clear();
+        });
         btnHttp.setOnAction(event -> {
 
             taDisplay.clear();
-            try{
-                
+            try {
                 String ip = tfUrl.getText();
-                URL url = new URL(ip);
-                System.out.println("连接成功！");
-                InputStream in = url.openStream();
-                 br = new BufferedReader(new InputStreamReader(in, "utf-8"));
+                if (!isURL(ip)) {
+                    taDisplay.appendText("当前url不合法");
+                } else {
+                    URL url = new URL(ip);
+                    System.out.println("连接成功！");
+                    InputStream in = url.openStream();
+                    br = new BufferedReader(new InputStreamReader(in, "utf-8"));
 //                readThread=new Thread(){
 //                    String msg =null;
 //                    while((msg=br.readLine())!=null){
 //                        taDisplay.appendText(msg.toString());
 //                    }
 //                };
-                readThread = new Thread(()->{
-        String msg;
-        //不知道服务器有多少回传信息，就持续不断接收
-        //由于在另外一个线程，不会阻塞主线程的正常运行
-        try {
-            while ((msg = br.readLine())!= null) {
-                //lambda表达式不能直接访问外部非final类型局部变量
-                //所以这里使用了一个临时变量
-                String msgTemp = msg;
-                Platform.runLater(() -> {
-                    taDisplay.appendText(msgTemp + "\r\n");
-                });
-            }
-        }
-        catch (IOException e){
-            e.printStackTrace();
-        }
-        //跳出了循环，说明服务器已关闭，读取为null，提示对话关闭
-        Platform.runLater(()->{
-            taDisplay.appendText("对话已关闭！\n" );
+                    readThread = new Thread(() -> {
+                        String msg;
+                        //不知道服务器有多少回传信息，就持续不断接收
+                        //由于在另外一个线程，不会阻塞主线程的正常运行
+                        try {
+                            while ((msg = br.readLine()) != null) {
+                                //lambda表达式不能直接访问外部非final类型局部变量
+                                //所以这里使用了一个临时变量
+                                String msgTemp = msg;
+                                Platform.runLater(() -> {
+                                    taDisplay.appendText(msgTemp + "\r\n");
+                                });
+                            }
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                        //跳出了循环，说明服务器已关闭，读取为null，提示对话关闭
+                        Platform.runLater(() -> {
+                            taDisplay.appendText("对话已关闭！\n");
+                        });
                     });
-                });
-                readThread.start();
-            }catch (IOException e){
+                    readThread.start();
+
+                    }
+                }catch(IOException e) {
                 e.printStackTrace();
             }
-           
         });
 
 
     }
-
+    public static boolean isURL(String str){
+        //转换为小写
+        str = str.toLowerCase();
+        String regex = "^((https|http|ftp|rtsp|mms)?://)"  //https、http、ftp、rtsp、mms
+                + "(([0-9a-z_!~*'().&=+$%-]+: )?[0-9a-z_!~*'().&=+$%-]+@)?" //ftp的user@
+                + "(([0-9]{1,3}\\.){3}[0-9]{1,3}" // IP形式的URL- 例如：199.194.52.184
+                + "|" // 允许IP和DOMAIN（域名）
+                + "([0-9a-z_!~*'()-]+\\.)*" // 域名- www.
+                + "([0-9a-z][0-9a-z-]{0,61})?[0-9a-z]\\." // 二级域名
+                + "[a-z]{2,6})" // first level domain- .com or .museum
+                + "(:[0-9]{1,5})?" // 端口号最大为65535,5位数
+                + "((/?)|" // a slash isn't required if there is no file name
+                + "(/[0-9a-z_!~*'().;?:@&=+$,%#-]+)+/?)$";
+        return  str.matches(regex);
+    }
 
 }
+//dddedc838f88c450fc0001db1ec8eb85
