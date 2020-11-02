@@ -43,7 +43,8 @@ public class PortScannerFX extends Application {
     private Button btnScan = new Button("扫描");
     private Button btnScanFast = new Button("快速扫描");
     private Button btnScanThread = new Button("多线程扫描");
-    private Button btnexit = new Button("推出");
+    private Button btnexit = new Button("退出");
+    private Button btnshut = new Button("停止扫描");
     private int portstart;
     private int portend;
     private String host;
@@ -64,7 +65,7 @@ public class PortScannerFX extends Application {
         tophbox1.setSpacing(10);
         tophbox1.setPadding(new Insets(10,20,10,20));
         tophbox1.setAlignment(Pos.CENTER);
-        tophbox1.getChildren().addAll(btnScan,btnScanFast,btnScanThread,btnexit);
+        tophbox1.getChildren().addAll(btnScan,btnScanFast,btnScanThread,btnshut,btnexit);
 
         VBox vBox = new VBox();
         vBox.setPadding(new Insets(10,20,10,20));
@@ -85,6 +86,7 @@ public class PortScannerFX extends Application {
         primaryStage.show();
 
         btnScan.setOnAction(event -> {
+            thread.interrupt();
             String host = tfip.getText();
             thread = new Thread(()->{
                 int portstart = Integer.parseInt(tfstart.getText());
@@ -107,6 +109,7 @@ public class PortScannerFX extends Application {
         });
 
         btnScanFast.setOnAction(event -> {
+            thread1.interrupt();
             host = tfip.getText();
             thread1 = new Thread(()->{
                  portstart = Integer.parseInt(tfstart.getText());
@@ -130,12 +133,16 @@ public class PortScannerFX extends Application {
         });
 
         btnScanThread.setOnAction(event -> {
+            executorService.shutdown();
             host = tfip.getText();
             portstart = Integer.parseInt(tfstart.getText());
             portend = Integer.parseInt(tfend.getText());
             for (int i = 0; i < 10; i++) {
                 executorService.execute(new ScanHandler(i));
             }
+        });
+        btnexit.setOnAction(event -> {
+            System.exit(0);
         });
     }
 

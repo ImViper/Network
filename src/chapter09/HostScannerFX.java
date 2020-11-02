@@ -35,6 +35,7 @@ public class HostScannerFX extends Application {
     private TextArea taResult = new TextArea();
     private Button btnScan = new Button("主机扫描");
     private Button btnExcu = new Button("执行命令");
+    private Button btnshut = new Button("停止扫描");
     Thread thread;
     Thread thread1;
     @Override
@@ -44,7 +45,7 @@ public class HostScannerFX extends Application {
         tophbox.setSpacing(10);
         tophbox.setPadding(new Insets(10,20,10,20));
         tophbox.setAlignment(Pos.CENTER);
-        tophbox.getChildren().addAll(new Label("起始地址"),tfstart,new Label("结束地址"),tfend,btnScan);
+        tophbox.getChildren().addAll(new Label("起始地址"),tfstart,new Label("结束地址"),tfend,btnScan,btnshut);
 
         HBox tophbox1 = new HBox();
         tophbox1.setSpacing(10);
