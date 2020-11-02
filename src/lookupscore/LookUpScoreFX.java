@@ -24,7 +24,7 @@ public class LookUpScoreFX extends Application {
     private Button btnConnect = new Button("连接");
     //待发送信息的文本框
     private TextField tfSend = new TextField("20181002946&蔡诚杰&jimmycai");
-    private TextField tfip = new TextField("172.16.229.253");
+    private TextField tfip = new TextField("202.116.195.71");
     private TextField tfport = new TextField("9009");
     //显示信息的文本区域
     private TextArea taDisplay = new TextArea();

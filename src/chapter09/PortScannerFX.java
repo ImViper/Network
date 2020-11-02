@@ -86,7 +86,6 @@ public class PortScannerFX extends Application {
         primaryStage.show();
 
         btnScan.setOnAction(event -> {
-            thread.interrupt();
             String host = tfip.getText();
             thread = new Thread(()->{
                 int portstart = Integer.parseInt(tfstart.getText());
@@ -109,7 +108,6 @@ public class PortScannerFX extends Application {
         });
 
         btnScanFast.setOnAction(event -> {
-            thread1.interrupt();
             host = tfip.getText();
             thread1 = new Thread(()->{
                  portstart = Integer.parseInt(tfstart.getText());
@@ -133,7 +131,6 @@ public class PortScannerFX extends Application {
         });
 
         btnScanThread.setOnAction(event -> {
-            executorService.shutdown();
             host = tfip.getText();
             portstart = Integer.parseInt(tfstart.getText());
             portend = Integer.parseInt(tfend.getText());
@@ -203,7 +200,7 @@ public class PortScannerFX extends Application {
                 }catch (IOException e){
                     String msg = "端口 " + port + " is closed \n";
                     Platform.runLater(()->{
-                        taResult.appendText(msg);
+//                        taResult.appendText(msg);
                     });
                     e.printStackTrace();
                 }
