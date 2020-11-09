@@ -21,6 +21,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.InetAddress;
+import java.util.Scanner;
+import java.util.concurrent.atomic.AtomicInteger;
 
 
 /**
@@ -36,8 +38,11 @@ public class HostScannerFX extends Application {
     private Button btnScan = new Button("主机扫描");
     private Button btnExcu = new Button("执行命令");
     private Button btnshut = new Button("停止扫描");
-    Thread thread;
     Thread thread1;
+    private long startIp;
+    private long endIp;
+    private ThreadGroup threadGroup = new ThreadGroup("scanThread");
+    static AtomicInteger hostCount = new AtomicInteger(0);
     @Override
     public void start(Stage primaryStage) throws Exception {
         BorderPane mainpane = new BorderPane();
@@ -72,34 +77,15 @@ public class HostScannerFX extends Application {
         primaryStage.show();
 
         btnScan.setOnAction(event -> {
-            String ipst = tfstart.getText();
-            String ipen = tfend.getText();
-            thread = new Thread(()->{
-                try{
-                    int ipstart = ipToInt(tfstart.getText());
-                    int ipend = ipToInt(tfend.getText());
-                    int timeout = 100;
-                    String host = ipst;
-                    while(ipstart<=ipend){
-                        InetAddress addr = InetAddress.getByName(host);
-                        boolean status = addr.isReachable(timeout);
-                        if(status == true){
-                            taResult.appendText(host+" reachable \r\n");
-                        }else{
-                            taResult.appendText(host+" is not reachable \r\n");
-                        }
-                        host = longToIp(++ipstart);
-                    }
+            this.startIp = IpUtils.ipToLong(tfstart.getText());
+            this.endIp = IpUtils.ipToLong(tfend.getText());
 
-                    Platform.runLater(()->{
-                        taResult.appendText("结束扫描"+"\n");
-                    });
-
-                }catch (IOException e){
-                    e.printStackTrace();
-                }
-            });
-            thread.start();
+            int thread = 16;
+            hostCount.set(0);
+            for (int i = 0; i < thread; i++) {
+                ScanHandler scanHandler = new ScanHandler(i, thread);
+                new Thread(threadGroup, scanHandler, "MultiThread" + i).start();
+            }
         });
 
         btnExcu.setOnAction(event -> {
@@ -111,8 +97,6 @@ public class HostScannerFX extends Application {
                     BufferedReader br = new BufferedReader(new InputStreamReader(in,"GBK"));
                     String msg;
                     while((msg = br.readLine())!=null){
-
-
 
                         String msgtemp= msg;
                         Platform.runLater(()->{
@@ -128,33 +112,56 @@ public class HostScannerFX extends Application {
 
     }
 
-    public static int ipToInt(String ip){
-        String[] ipArray =  ip.split("\\.");
-        int num=0;
-        for(int i=0;i<ipArray.length;i++){
-            int valueOfSection = Integer.parseInt(ipArray[i]);
-            num = (valueOfSection << 8*(3-i)) | num;
+
+
+    class ScanHandler implements Runnable{
+        private int totalThreadNum;
+        private int threadNo;
+
+        public ScanHandler(int threadNo) {
+            this.totalThreadNum = 10;
+            this.threadNo = threadNo;
         }
-        return num;
-    }
 
-    public static String longToIp(long ip) {
-        StringBuilder result = new StringBuilder(15);
+        public ScanHandler(int threadNo, int totalThreadNum) {
+            this.totalThreadNum = totalThreadNum;
+            this.threadNo = threadNo;
+        }
 
-        for (int i = 0; i < 4; i++) {
-
-            result.insert(0,Long.toString(ip & 0xff));
-
-            if (i < 3) {
-                result.insert(0,'.');
+        @Override
+        public void run() {
+            for (long host = startIp + threadNo; host <= endIp; host = host + totalThreadNum) {
+                if (Thread.currentThread().isInterrupted()) {
+                    System.out.println("interrupted!");
+                    break;
+                }
+                try {
+                    boolean res = isReachable(IpUtils.longToIp(host));
+                    if (res) {
+                        long finalHost1 = host;
+                        Platform.runLater(()->{
+                            taResult.appendText(IpUtils.longToIp(finalHost1) + " is reachable.\n");
+                        });
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                hostCount.incrementAndGet();
             }
-
-            ip = ip >> 8;
+            if (hostCount.get() == (endIp - startIp +1)) {
+                hostCount.incrementAndGet();
+                Platform.runLater(() -> {
+                    taResult.appendText("扫描完毕");
+                });
+            }
         }
-        return result.toString();
     }
 
+    private boolean isReachable(String host) throws IOException {
+            InetAddress address = InetAddress.getByName(host);
+            return address.isReachable(100);
 
+    }
 
 //    public static void main(String[] args) {
 //        System.out.println(StringIPAddOne("192.168.1.255"));
