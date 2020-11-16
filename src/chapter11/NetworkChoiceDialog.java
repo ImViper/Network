@@ -58,7 +58,7 @@ public class NetworkChoiceDialog {
         Scene scene = new Scene(vBox);
         stage.setScene(scene);
 
-        vBox.getChildren().addAll(new Label("请选择网卡："), comboBox
+        vBox.getChildren().addAll(new Label("请选择网卡："), comboBox,hBoxBottom
         );
         btnConfirm.setOnAction(event -> {
             try {
