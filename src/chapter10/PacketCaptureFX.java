@@ -110,9 +110,24 @@ public class PacketCaptureFX extends Application {
     class PacketHandler implements PacketReceiver {
         @Override
         public void receivePacket(Packet packet) {
-            Platform.runLater(() -> {
-                taDisplay.appendText(packet.toString() + "\n");
-            });
+            String keyData = configDialog.getKeyData();
+
+            if(keyData == null || keyData.trim().equalsIgnoreCase(""))
+                return;
+            try{
+                String[] keyList = keyData.split(" ");
+                String msg = new String(packet.data,0,packet.data.length,"utf-8");
+                for(String key : keyList){
+                    if(msg.toUpperCase().contains(key.toUpperCase())){
+                        Platform.runLater(()->{
+                          taDisplay.appendText("数据部分"+msg+"\n\n");
+                        });
+                        break;
+                    }
+                }
+            }catch (Exception e){
+                System.err.println(e.getMessage());
+            }
         }
     }
     private  void interrupt(String threadName){
