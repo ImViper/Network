@@ -30,12 +30,12 @@ public class PacketSender {
     public static void sendTCPPacket(JpcapSender sender,int srcPort,int dstPort,String srcHost,String dstHost,String data,String srcMAC,String dstMAC,boolean syn,boolean ack,boolean rst,boolean fin){
         try{
             //构造一个TCP包
-            TCPPacket tcp = new TCPPacket(8000,80,56,78,false,false,false,false,true,false,true,true,200,10);
+            TCPPacket tcp = new TCPPacket(srcPort,dstPort,56,78,false,ack,false,rst,syn,fin,true,true,200,10);
             //设置IPv4报头参数，ip地址可以伪造
             tcp.setIPv4Parameter(0,false,false,false,0,false,false,false,0,1010101,100, IPPacket.IPPROTO_TCP, InetAddress.getByName(srcHost),
                     InetAddress.getByName (dstHost));
             //填充TCP包中的数据
-            tcp.data= "填充的数据".getBytes("utf-8");//字节数组型的填充数据
+            tcp.data= data.getBytes("utf-8");//字节数组型的填充数据
             //构造相应的MAC帧
 //create an Ethernet packet (frame)
             EthernetPacket ether=new EthernetPacket();

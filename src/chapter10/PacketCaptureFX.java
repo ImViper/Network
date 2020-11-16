@@ -110,6 +110,9 @@ public class PacketCaptureFX extends Application {
     class PacketHandler implements PacketReceiver {
         @Override
         public void receivePacket(Packet packet) {
+            Platform.runLater(()->{
+                taDisplay.appendText(packet.toString()+"\n");
+            });
             String keyData = configDialog.getKeyData();
 
             if(keyData == null || keyData.trim().equalsIgnoreCase(""))
