@@ -27,7 +27,7 @@ import java.rmi.registry.Registry;
  */
 public class RmiStudentClientFX extends Application {
     private TextArea taDisplay = new TextArea();
-    private TextField tfMessage = new TextField();
+    private TextField tfMessage = new TextField("20181002946&我的RMI服务器已经启动");
     private TextField tfNO = new TextField();
     private TextField tfName = new TextField();
     Button btnSendMsg = new Button("发送信息");
@@ -67,13 +67,20 @@ public class RmiStudentClientFX extends Application {
             }
         });
 
+        btnSendNoAndName.setOnAction(event -> {
+            try {
+                taDisplay.appendText(rmiMsgService.send(tfNO.getText(), tfName.getText()) + "\n");
+            } catch (RemoteException e) {
+                e.printStackTrace();
+            }
+        });
 
 
     }
 
     public void rmiInit(){
         try{
-            Registry registry = LocateRegistry.getRegistry("127.0.0.1",1099);
+            Registry registry = LocateRegistry.getRegistry("202.116.195.71",1099);
             System.out.println("RMI远程服务别名列表：");
             for (String name: registry.list()
                  ) {

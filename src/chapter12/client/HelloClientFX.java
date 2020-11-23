@@ -1,5 +1,6 @@
 package chapter12.client;
 
+import chapter12.server.RmiStudentServer;
 import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -13,6 +14,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import rmi.HelloService;
+import rmi.RmiKitService;
 
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
@@ -31,7 +33,7 @@ public class HelloClientFX extends Application {
     private Button btnGetTime = new Button("调用getTime方法");
 
     private HelloService helloService;
-
+    private RmiKitService rmiKitService;
     public static void main(String[] args) {
         launch(args);
     }
@@ -65,7 +67,8 @@ public class HelloClientFX extends Application {
 
         btnGetTime.setOnAction(event -> {
             try{
-                String msg = helloService.getTime().toString();
+//                String msg = helloService.getTime().toString();
+                String msg = rmiKitService.longToIp(2130706433);
                 taDisplay.appendText(msg+"\n");
             } catch (RemoteException e) {
                 e.printStackTrace();
@@ -82,7 +85,11 @@ public class HelloClientFX extends Application {
                  ) {
                 System.out.println(name);
             }
-            helloService = (HelloService)registry.lookup("HelloService");
+//            helloService = (HelloService)registry.lookup("HelloService");
+            rmiKitService = (RmiKitService)registry.lookup("RmiKitService");
+            System.out.println("cnm");
+
+
 
         }catch (Exception e){
             e.printStackTrace();

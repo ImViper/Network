@@ -10,8 +10,8 @@ import java.rmi.RemoteException;
  */
 public interface RmiKitService extends Remote {
     public long ipToLong(String ip)throws RemoteException;
-    public String LongtoIp(long ipNum) throws RemoteException ;
+    public String longToIp(long ipNum) throws RemoteException ;
     public byte[] macStringToBytes(String macStr) throws RemoteException;
-    public String bytesToMacString(byte[] macBytes)throws RemoteException;
+    public String bytesToMACString(byte[] macBytes)throws RemoteException;
 
 }

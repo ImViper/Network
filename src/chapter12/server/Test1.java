@@ -10,13 +10,18 @@ import java.rmi.server.UnicastRemoteObject;
  * author:蔡诚杰;
  * date; 2020/11/23
  */
-public class RmiKitServiceImpl extends UnicastRemoteObject implements RmiKitService {
-    public RmiKitServiceImpl() throws RemoteException {
-
+public class Test1  {
+    public static void main(String[] args) throws RemoteException {
+        String ip = "127.0.0.1";
+        System.out.println(ipToLong(ip));
+        System.out.println(longToIp(2130706433));
+        byte[] by = new byte[10];
+        by = macStringToBytes("A0-C5-89-88-9D-ED");
+        System.out.println(by[1]);
+        System.out.println(bytesToMACString(by));
     }
 
-    @Override
-    public long ipToLong(String ip) throws RemoteException {
+    public static long ipToLong(String ip) throws RemoteException {
         String[] s = ip.split("\\.");
         long lIp = (Long.parseLong(s[0]) << 24)
                 + (Long.parseLong(s[1]) << 16) +
@@ -25,8 +30,8 @@ public class RmiKitServiceImpl extends UnicastRemoteObject implements RmiKitServ
         return lIp;
     }
 
-    @Override
-    public String longToIp(long ipNum) throws RemoteException {
+
+    public static String longToIp(long ipNum) throws RemoteException {
         StringBuffer sb = new StringBuffer("");
         sb.append(String.valueOf(ipNum >> 24)).append(".").
                 append(String.valueOf((ipNum & 0x00ffffff) >> 16)).append(".").
@@ -35,8 +40,8 @@ public class RmiKitServiceImpl extends UnicastRemoteObject implements RmiKitServ
         return sb.toString();
     }
 
-    @Override
-    public byte[] macStringToBytes(String macStr) throws RemoteException {
+
+    public static byte[] macStringToBytes(String macStr) throws RemoteException {
         String[] macs = new String[6];
         if (macStr.contains("-")) {
             macs = doSplit(macStr, "-");
@@ -52,8 +57,8 @@ public class RmiKitServiceImpl extends UnicastRemoteObject implements RmiKitServ
         return result;
     }
 
-    @Override
-    public String bytesToMACString(byte[] macBytes) throws RemoteException {
+
+    public static String bytesToMACString(byte[] macBytes) throws RemoteException {
         StringBuffer sb = new StringBuffer("");
 
         for (int i = 0; i < macBytes.length; i++) {
