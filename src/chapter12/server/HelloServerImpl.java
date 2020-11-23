@@ -22,7 +22,7 @@ public class HelloServerImpl extends UnicastRemoteObject implements HelloService
     @Override
     public String echo(String msg) throws RemoteException {
         System.out.println("服务器端完成一些echo方法相关任务。。");
-        return "echo:"+msg+"from"+name;
+        return "echo:"+msg+" from "+name;
     }
 
     @Override
