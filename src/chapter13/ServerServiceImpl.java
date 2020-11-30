@@ -2,6 +2,7 @@ package chapter13;
 
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -51,9 +52,23 @@ public class ServerServiceImpl extends UnicastRemoteObject implements ServerServ
             {
                 ClientService clientService = onlineGroup.get(onlineUser);
                 if(clientService != null){
-
+                    clientService.showMsgToClient(client+"发送："+msg);
+                }else{
+                    deleteNulluser();
                 }
             }
         }
+    }
+
+    private void deleteNulluser(){
+        for(Map.Entry<String, ClientService> user:onlineGroup.entrySet()){
+            String key = user.getKey();
+            ClientService client = user.getValue();
+            if(client==null){
+                onlineGroup.remove(key);
+            }
+
+        }
+
     }
 }

@@ -84,7 +84,8 @@ public class RmiClientFX extends Application {
 
     private void initRmi() {
         try{
-            String ip = "202.116.195.71";
+//            String ip = "202.116.195.71";
+            String ip = "127.0.0.1";
             int port = 8008;
             Registry registry = LocateRegistry.getRegistry(ip,port );
             for (String name : registry.list()
@@ -117,6 +118,7 @@ public class RmiClientFX extends Application {
             String sendmsg = tfMsg.getText();
             try{
                 serverService.sendPublicMsgToServer(client,sendmsg);
+                taDisplay.clear();
             }catch (RemoteException e){
                 e.printStackTrace();
             }

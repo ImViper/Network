@@ -25,10 +25,10 @@ public class ARPTrap {
   private ARPPacket arpReplyToGate;//用于欺骗网关的ARP REPLAY包
 
 
-  public static void main(String[] args) throws IOException {
-    //监控目标B的MAC地址及网关的MAC地址
-    byte[] targetMAC, gateMAC;
-    String targetIP, gateIP;//监控目标B的IP地址，真实网关的IP地址
+    public static void main(String[] args) throws IOException {
+      //监控目标B的MAC地址及网关的MAC地址
+      byte[] targetMAC, gateMAC;
+      String targetIP, gateIP;//监控目标B的IP地址，真实网关的IP地址
 
     //网关的MAC和IP地址
     gateMAC = new byte[]{(byte)1,(byte)2,(byte)3,(byte)4,(byte)5,(byte)6};
