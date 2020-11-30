@@ -20,6 +20,7 @@ public class HelloServer {
 
             registry.bind("HelloService",helloService);
             System.out.println("发布了一个HelloService RMI远程服务");
+            System.setProperty("sun.rmi.transport.tcp.responseTimeout", "5000");
 
         }catch (RemoteException | AlreadyBoundException e){
             e.printStackTrace();
