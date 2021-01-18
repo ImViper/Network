@@ -3,6 +3,7 @@ package chapter03;
 import chapter01.TextFileIO;
 import javafx.application.Application;
 import javafx.application.Platform;
+import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -10,6 +11,8 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
@@ -117,7 +120,24 @@ public class TCPClientThreadFX extends Application {
 //            taDisplay.appendText(receiveMsg + "\n");
             tfSend.clear();
         });
-
+        tfSend.setOnKeyPressed(new EventHandler<KeyEvent>() {
+            public void handle(KeyEvent keyEvent) {
+                if (keyEvent.getCode() == KeyCode.ENTER) {
+                    String sendMsg = tfSend.getText();
+                    tcpClient.send(sendMsg);//向服务器发送一串字符
+                    taDisplay.appendText("客户端发送：" + sendMsg + "\n");
+                    //用于接收服务器信息的单独线程
+                    //String receiveMsg = tcpClient.receive();//从服务器接收一行字符
+                    //  taDisplay.appendText(receiveMsg + "\n");
+                    tfSend.clear();
+                    if(sendMsg.equals("bye")) {
+                        btnSend.setDisable(true);
+                        btnConnect.setDisable(false);
+                    }
+                }
+            }
+        });
+        taDisplay.setWrapText(true);
     }
 
     private void endSystem() {

@@ -118,7 +118,7 @@ public class RmiClientFX extends Application {
             String sendmsg = tfMsg.getText();
             try{
                 serverService.sendPublicMsgToServer(client,sendmsg);
-                taDisplay.clear();
+//                taDisplay.clear();
             }catch (RemoteException e){
                 e.printStackTrace();
             }
